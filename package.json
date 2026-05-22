@@ -1,18 +1,8 @@
 {
-    "name": "gemini-code-editor",
+    "name": "gemini-code-studio",
     "version": "1.0.0",
-    "description": "AI-powered code editor with Gemini integration",
-    "main": "index.html",
     "scripts": {
         "dev": "vercel dev",
-        "deploy": "vercel --prod",
-        "start": "vercel dev"
-    },
-    "keywords": ["gemini", "ai", "code-editor", "debugger"],
-    "author": "Your Name",
-    "license": "MIT",
-    "dependencies": {},
-    "devDependencies": {
-        "vercel": "^32.0.0"
+        "deploy": "vercel --prod"
     }
 }
