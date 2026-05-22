@@ -2,626 +2,203 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Code Studio | AI-Powered Professional Editor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Gemini Code Editor</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #0a0a0f;
-            overflow-x: hidden;
-        }
-
-        .bg-gradient {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(30, 30, 60, 0.4) 0%, rgba(10, 10, 15, 0.95) 100%);
-            z-index: -1;
-        }
-
-        .app-container {
-            max-width: 1600px;
-            margin: 0 auto;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            font-family: system-ui, sans-serif;
+            min-height: 100vh;
             padding: 20px;
         }
-
+        .container { max-width: 1400px; margin: 0 auto; }
         .header {
-            background: rgba(18, 18, 30, 0.8);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 20px 32px;
-            margin-bottom: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
         }
-
-        .logo-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
-        }
-
-        .logo-text h1 {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .logo-text p {
-            font-size: 12px;
-            color: #8b8b9b;
-            margin-top: 2px;
-        }
-
-        .status-badge {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-size: 14px;
-            font-weight: 500;
-            color: #10b981;
-        }
-
-        .main-grid {
+        h1 { color: #333; }
+        .main {
             display: grid;
-            grid-template-columns: 1fr 420px;
-            gap: 24px;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
         }
-
-        .editor-panel {
-            background: #111118;
-            border-radius: 24px;
-            border: 1px solid #2a2a35;
+        .editor-box {
+            background: #1e1e1e;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
         }
-
-        .editor-toolbar {
-            background: #1a1a24;
-            padding: 12px 20px;
-            border-bottom: 1px solid #2a2a35;
+        .toolbar {
+            background: #2d2d2d;
+            padding: 12px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
-
-        .lang-badge {
-            background: #2a2a35;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 500;
-            color: #a78bfa;
-        }
-
-        .editor-actions {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn {
-            padding: 8px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 13px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.5);
-        }
-
-        .btn-success {
-            background: #10b981;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-            transform: translateY(-1px);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #3a3a48;
-            color: #c0c0d0;
-        }
-
-        .btn-outline:hover {
-            background: #2a2a35;
-            border-color: #6366f1;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        #codeEditor {
+        textarea {
             width: 100%;
-            height: 520px;
-            background: #0c0c12;
-            color: #e4e4e7;
-            font-family: 'Fira Code', 'Courier New', monospace;
+            height: 550px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: monospace;
             font-size: 14px;
-            padding: 24px;
+            padding: 20px;
             border: none;
             outline: none;
             resize: none;
-            line-height: 1.6;
-            tab-size: 4;
         }
-
-        .right-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
         .card {
-            background: rgba(17, 17, 24, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid #2a2a35;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #2a2a35;
-        }
-
-        .card-header i {
-            font-size: 20px;
-            color: #6366f1;
-        }
-
-        .card-header h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .error-container {
-            max-height: 280px;
-            overflow-y: auto;
-        }
-
-        .error-item {
-            background: rgba(239, 68, 68, 0.08);
-            border-left: 3px solid #ef4444;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 10px;
-        }
-
-        .error-type {
-            font-weight: 700;
-            font-size: 12px;
-            color: #ef4444;
-            margin-bottom: 5px;
-        }
-
-        .error-desc {
-            font-size: 12px;
-            color: #cbd5e1;
-            line-height: 1.4;
-        }
-
-        .error-line {
-            font-size: 10px;
-            color: #6b7280;
-            margin-top: 6px;
-        }
-
-        .preview-area {
-            background: #0c0c12;
-            border-radius: 12px;
-            padding: 14px;
-            max-height: 220px;
-            overflow-y: auto;
-            font-family: 'Fira Code', monospace;
-            font-size: 11px;
-            color: #a5f3c3;
-            white-space: pre-wrap;
-            margin: 12px 0;
-        }
-
-        .auto-fix-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #0c0c12;
-            padding: 12px;
-            border-radius: 12px;
-            margin-top: 12px;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 48px;
-            height: 24px;
-            background: #2a2a35;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .toggle-switch.active {
-            background: #6366f1;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            width: 20px;
-            height: 20px;
             background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 3px;
-            transition: 0.2s;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
-
-        .toggle-switch.active .toggle-slider {
-            left: 25px;
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 8px;
         }
-
-        .loading-overlay {
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-success { background: #10b981; color: white; }
+        .error-item {
+            background: #fee;
+            border-left: 3px solid #ef4444;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .preview {
+            background: #f0f0f0;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+        .loading {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: black;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
             display: none;
-            justify-content: center;
-            align-items: center;
             z-index: 1000;
-            flex-direction: column;
-            gap: 16px;
         }
-
-        .loading-overlay.active {
-            display: flex;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid #2a2a35;
-            border-top-color: #6366f1;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #1a1a24;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #3a3a48;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6366f1;
-        }
-
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-            .app-container {
-                padding: 12px;
-            }
-        }
+        @media (max-width: 768px) { .main { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <div class="bg-gradient"></div>
-    <div class="app-container">
+    <div class="container">
         <div class="header">
-            <div class="logo-section">
-                <div class="logo-icon">
-                    <i class="fas fa-code"></i>
-                </div>
-                <div class="logo-text">
-                    <h1>Gemini Code Studio</h1>
-                    <p>AI-Powered Intelligent Code Editor</p>
-                </div>
-            </div>
-            <div class="status-badge" id="apiStatus">
-                <i class="fas fa-shield-alt"></i> Secure API Ready
-            </div>
+            <h1>🤖 Gemini Code Editor</h1>
+            <p>AI-Powered Bug Fixer | Using Gemini API</p>
         </div>
-
-        <div class="main-grid">
-            <div class="editor-panel">
-                <div class="editor-toolbar">
-                    <div class="lang-badge">
-                        <i class="fas fa-terminal"></i> JavaScript / Python / HTML
-                    </div>
-                    <div class="editor-actions">
-                        <button class="btn btn-primary" id="autoFixBtn">
-                            <i class="fas fa-magic"></i> Auto-Fix Now
-                        </button>
-                        <button class="btn btn-success" id="applyFixBtn" disabled>
-                            <i class="fas fa-check-double"></i> Apply Fix
-                        </button>
-                    </div>
+        
+        <div class="main">
+            <div class="editor-box">
+                <div class="toolbar">
+                    <button class="btn-primary" id="fixBtn">🔍 Detect & Fix</button>
+                    <button class="btn-success" id="applyBtn" disabled>✅ Apply Fix</button>
                 </div>
-                <textarea id="codeEditor" placeholder="Write your code here...">// Welcome to Gemini Code Studio 🚀
-// AI will automatically detect and fix bugs
-
+                <textarea id="editor">// Buggy code example:
 function calculateAverage(numbers) {
   let sum = 0;
-  // BUG: Off by one error - using <= instead of <
   for(let i = 0; i <= numbers.length; i++) {
     sum += numbers[i];
   }
   return sum / numbers.length;
 }
 
-const scores = [85, 92, 78, 90];
-const avg = calculateAverage(scores);
-console.log("Average score:", avg);
-
-// Click "Auto-Fix Now" - AI will fix all bugs instantly!</textarea>
+const scores = [10, 20, 30, 40];
+console.log(calculateAverage(scores));</textarea>
             </div>
-
-            <div class="right-panel">
+            
+            <div>
                 <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-robot"></i>
-                        <h3>AI Smart Fix</h3>
-                    </div>
-                    <div class="auto-fix-toggle">
-                        <span style="font-size: 13px; color: #cbd5e1;">
-                            <i class="fas fa-bolt"></i> Real-time Auto Detect
-                        </span>
-                        <div id="autoToggle" class="toggle-switch active">
-                            <div class="toggle-slider"></div>
-                        </div>
-                    </div>
-                    <div style="font-size: 11px; color: #6b7280; margin-top: 10px;">
-                        <i class="fas fa-info-circle"></i> Auto mode detects errors & shows fix instantly
-                    </div>
+                    <h3>🐛 Errors Found</h3>
+                    <div id="errors">Click "Detect & Fix" to start</div>
                 </div>
-
                 <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-bug"></i>
-                        <h3>Detected Issues</h3>
-                        <span id="errorCount" style="background: #ef444420; padding: 2px 8px; border-radius: 20px; font-size: 11px;">0</span>
-                    </div>
-                    <div id="errorList" class="error-container">
-                        <div style="text-align: center; color: #6b7280; padding: 30px;">
-                            <i class="fas fa-check-circle" style="font-size: 30px; margin-bottom: 10px;"></i>
-                            <p>No errors detected yet</p>
-                            <p style="font-size: 11px; margin-top: 5px;">Click "Auto-Fix Now" to analyze</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-eye"></i>
-                        <h3>AI Fix Preview</h3>
-                    </div>
-                    <div id="fixPreview" class="preview-area">
-                        <i class="fas fa-lightbulb"></i> Click "Auto-Fix Now" to see AI solution...
-                    </div>
-                    <button class="btn btn-outline" id="previewDiffBtn" style="width: 100%; margin-top: 8px;">
-                        <i class="fas fa-code-branch"></i> Show Difference
-                    </button>
+                    <h3>💡 AI Fix Preview</h3>
+                    <div id="preview" class="preview">No fix yet</div>
                 </div>
             </div>
         </div>
     </div>
-
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-spinner"></div>
-        <div style="color: white; font-weight: 500;">🤖 Gemini AI is analyzing your code...</div>
-        <div style="color: #8b8b9b; font-size: 12px;">Detecting bugs & generating fix</div>
-    </div>
+    
+    <div id="loading" class="loading">🤖 AI is thinking...</div>
 
     <script>
-        const codeEditor = document.getElementById('codeEditor');
-        const autoFixBtn = document.getElementById('autoFixBtn');
-        const applyFixBtn = document.getElementById('applyFixBtn');
-        const errorList = document.getElementById('errorList');
-        const fixPreview = document.getElementById('fixPreview');
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const errorCount = document.getElementById('errorCount');
-        const autoToggle = document.getElementById('autoToggle');
-        const previewDiffBtn = document.getElementById('previewDiffBtn');
-
+        const editor = document.getElementById('editor');
+        const fixBtn = document.getElementById('fixBtn');
+        const applyBtn = document.getElementById('applyBtn');
+        const errorsDiv = document.getElementById('errors');
+        const previewDiv = document.getElementById('preview');
+        const loading = document.getElementById('loading');
+        
         let fixedCode = '';
-        let autoToggleActive = true;
-
-        autoToggle.addEventListener('click', () => {
-            autoToggleActive = !autoToggleActive;
-            if (autoToggleActive) {
-                autoToggle.classList.add('active');
-            } else {
-                autoToggle.classList.remove('active');
-            }
-        });
-
-        function getCode() {
-            return codeEditor.value;
-        }
-
-        function updateErrorDisplay(errors) {
-            if (!errors || errors.length === 0) {
-                errorList.innerHTML = `
-                    <div style="text-align: center; color: #10b981; padding: 30px;">
-                        <i class="fas fa-check-circle" style="font-size: 30px; margin-bottom: 10px;"></i>
-                        <p>✅ No issues found!</p>
-                        <p style="font-size: 11px; margin-top: 5px;">Your code looks perfect</p>
-                    </div>
-                `;
-                errorCount.textContent = '0';
-                errorCount.style.background = '#10b98120';
-                return;
-            }
-
-            let html = '';
-            errors.forEach(err => {
-                html += `
-                    <div class="error-item">
-                        <div class="error-type">
-                            <i class="fas fa-exclamation-triangle"></i> ${err.type || 'Issue'}
-                        </div>
-                        <div class="error-desc">${err.description || err.message}</div>
-                        <div class="error-line"><i class="fas fa-map-pin"></i> ${err.line || 'Line unknown'}</div>
-                    </div>
-                `;
-            });
-            errorList.innerHTML = html;
-            errorCount.textContent = errors.length;
-            errorCount.style.background = '#ef444420';
-        }
-
-        async function autoFixCode() {
-            const code = getCode();
-            if (!code.trim()) {
-                alert('Please write some code first!');
-                return;
-            }
-
-            loadingOverlay.classList.add('active');
-            autoFixBtn.disabled = true;
-
+        
+        async function detectAndFix() {
+            const code = editor.value;
+            if (!code.trim()) return alert('Write some code first!');
+            
+            loading.style.display = 'block';
+            fixBtn.disabled = true;
+            
             try {
-                const response = await fetch('/api/fix-code', {
+                const res = await fetch('/api/fix-code', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: code })
+                    body: JSON.stringify({ code })
                 });
-
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'API call failed');
-                }
-
-                const result = await response.json();
                 
-                updateErrorDisplay(result.errors || []);
-                fixedCode = result.fixedCode || code;
+                const data = await res.json();
+                
+                if (data.errors?.length) {
+                    errorsDiv.innerHTML = data.errors.map(e => 
+                        `<div class="error-item"><strong>⚠️ ${e.type}</strong><br>${e.description}<br><small>Line: ${e.line || '?'}</small></div>`
+                    ).join('');
+                } else {
+                    errorsDiv.innerHTML = '<div style="color: #10b981;">✅ No errors found!</div>';
+                }
+                
+                fixedCode = data.fixedCode || code;
                 
                 if (fixedCode !== code) {
-                    const preview = fixedCode.length > 800 ? fixedCode.substring(0, 800) + '...' : fixedCode;
-                    fixPreview.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981;"></i> Fixed version ready:\n\n${preview}`;
-                    applyFixBtn.disabled = false;
+                    previewDiv.innerHTML = fixedCode.substring(0, 500);
+                    applyBtn.disabled = false;
                 } else {
-                    fixPreview.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981;"></i> No fixes needed! Code is already optimized.`;
-                    applyFixBtn.disabled = true;
+                    previewDiv.innerHTML = '✨ No fixes needed!';
                 }
-                
-            } catch (error) {
-                console.error('Error:', error);
-                errorList.innerHTML = `
-                    <div class="error-item" style="border-left-color: #f59e0b;">
-                        <div class="error-type">⚠️ Error</div>
-                        <div class="error-desc">${error.message}</div>
-                        <div class="error-line">Check that GEMINI_API_KEY is set in Vercel environment variables</div>
-                    </div>
-                `;
-                fixPreview.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> Error: ${error.message}`;
+            } catch(err) {
+                errorsDiv.innerHTML = `<div class="error-item">❌ Error: ${err.message}</div>`;
             } finally {
-                loadingOverlay.classList.remove('active');
-                autoFixBtn.disabled = false;
+                loading.style.display = 'none';
+                fixBtn.disabled = false;
             }
         }
-
-        function applyFixedCode() {
-            if (!fixedCode) {
-                alert('No fix available. Click "Auto-Fix Now" first.');
-                return;
+        
+        function applyFix() {
+            if (fixedCode) {
+                editor.value = fixedCode;
+                applyBtn.disabled = true;
+                previewDiv.innerHTML = '✅ Code fixed and applied!';
             }
-            codeEditor.value = fixedCode;
-            applyFixBtn.disabled = true;
-            fixPreview.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981;"></i> ✅ Code fixed and applied successfully!`;
         }
-
-        function showDiff() {
-            if (!fixedCode) {
-                alert('No fix available. Run auto-fix first.');
-                return;
-            }
-            const current = getCode();
-            if (current === fixedCode) {
-                alert('Code is already fixed! No differences.');
-                return;
-            }
-            fixPreview.innerHTML = `<i class="fas fa-code-branch"></i> DIFFERENCE:\n\nORIGINAL (${current.length} chars)\nvs\nFIXED (${fixedCode.length} chars)\n\n--- FIXED VERSION ---\n${fixedCode.substring(0, 600)}...`;
-        }
-
-        autoFixBtn.addEventListener('click', autoFixCode);
-        applyFixBtn.addEventListener('click', applyFixedCode);
-        previewDiffBtn.addEventListener('click', showDiff);
+        
+        fixBtn.addEventListener('click', detectAndFix);
+        applyBtn.addEventListener('click', applyFix);
     </script>
 </body>
 </html>
