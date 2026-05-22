@@ -19,7 +19,6 @@
             overflow-x: hidden;
         }
 
-        /* Gradient Background */
         .bg-gradient {
             position: fixed;
             top: 0;
@@ -30,14 +29,12 @@
             z-index: -1;
         }
 
-        /* Container */
         .app-container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        /* Header */
         .header {
             background: rgba(18, 18, 30, 0.8);
             backdrop-filter: blur(20px);
@@ -95,14 +92,12 @@
             color: #10b981;
         }
 
-        /* Main Grid */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 420px;
             gap: 24px;
         }
 
-        /* Editor Panel */
         .editor-panel {
             background: #111118;
             border-radius: 24px;
@@ -203,7 +198,6 @@
             tab-size: 4;
         }
 
-        /* Right Panel */
         .right-panel {
             display: flex;
             flex-direction: column;
@@ -238,7 +232,6 @@
             color: #fff;
         }
 
-        /* Error List */
         .error-container {
             max-height: 280px;
             overflow-y: auto;
@@ -271,7 +264,6 @@
             margin-top: 6px;
         }
 
-        /* Fix Preview */
         .preview-area {
             background: #0c0c12;
             border-radius: 12px;
@@ -285,7 +277,6 @@
             margin: 12px 0;
         }
 
-        /* Auto-Fix Toggle */
         .auto-fix-toggle {
             display: flex;
             align-items: center;
@@ -325,7 +316,6 @@
             left: 25px;
         }
 
-        /* Loading */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -359,7 +349,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -392,7 +381,6 @@
 <body>
     <div class="bg-gradient"></div>
     <div class="app-container">
-        <!-- Header -->
         <div class="header">
             <div class="logo-section">
                 <div class="logo-icon">
@@ -408,9 +396,7 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="main-grid">
-            <!-- Editor Panel -->
             <div class="editor-panel">
                 <div class="editor-toolbar">
                     <div class="lang-badge">
@@ -444,9 +430,7 @@ console.log("Average score:", avg);
 // Click "Auto-Fix Now" - AI will fix all bugs instantly!</textarea>
             </div>
 
-            <!-- Right Panel -->
             <div class="right-panel">
-                <!-- Auto-Fix Settings -->
                 <div class="card">
                     <div class="card-header">
                         <i class="fas fa-robot"></i>
@@ -465,7 +449,6 @@ console.log("Average score:", avg);
                     </div>
                 </div>
 
-                <!-- Errors Panel -->
                 <div class="card">
                     <div class="card-header">
                         <i class="fas fa-bug"></i>
@@ -481,7 +464,6 @@ console.log("Average score:", avg);
                     </div>
                 </div>
 
-                <!-- Fix Preview -->
                 <div class="card">
                     <div class="card-header">
                         <i class="fas fa-eye"></i>
@@ -498,7 +480,6 @@ console.log("Average score:", avg);
         </div>
     </div>
 
-    <!-- Loading Overlay -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner"></div>
         <div style="color: white; font-weight: 500;">🤖 Gemini AI is analyzing your code...</div>
@@ -506,7 +487,6 @@ console.log("Average score:", avg);
     </div>
 
     <script>
-        // DOM Elements
         const codeEditor = document.getElementById('codeEditor');
         const autoFixBtn = document.getElementById('autoFixBtn');
         const applyFixBtn = document.getElementById('applyFixBtn');
@@ -517,14 +497,9 @@ console.log("Average score:", avg);
         const autoToggle = document.getElementById('autoToggle');
         const previewDiffBtn = document.getElementById('previewDiffBtn');
 
-        let currentCode = '';
         let fixedCode = '';
-        let currentErrors = [];
-        let autoFixEnabled = true;
-        let originalCode = '';
-
-        // Auto-fix toggle
         let autoToggleActive = true;
+
         autoToggle.addEventListener('click', () => {
             autoToggleActive = !autoToggleActive;
             if (autoToggleActive) {
@@ -534,12 +509,10 @@ console.log("Average score:", avg);
             }
         });
 
-        // Get current code
         function getCode() {
             return codeEditor.value;
         }
 
-        // Update error display
         function updateErrorDisplay(errors) {
             if (!errors || errors.length === 0) {
                 errorList.innerHTML = `
@@ -571,23 +544,6 @@ console.log("Average score:", avg);
             errorCount.style.background = '#ef444420';
         }
 
-        // Call Gemini API
-        async function callGeminiAPI(code) {
-            const response = await fetch('/api/fix-code', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: code })
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'API call failed');
-            }
-
-            return await response.json();
-        }
-
-        // Auto fix function
         async function autoFixCode() {
             const code = getCode();
             if (!code.trim()) {
@@ -599,24 +555,26 @@ console.log("Average score:", avg);
             autoFixBtn.disabled = true;
 
             try {
-                const result = await callGeminiAPI(code);
+                const response = await fetch('/api/fix-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'API call failed');
+                }
+
+                const result = await response.json();
                 
-                currentErrors = result.errors || [];
+                updateErrorDisplay(result.errors || []);
                 fixedCode = result.fixedCode || code;
                 
-                // Update UI
-                updateErrorDisplay(currentErrors);
-                
                 if (fixedCode !== code) {
-                    // Show preview with diff
                     const preview = fixedCode.length > 800 ? fixedCode.substring(0, 800) + '...' : fixedCode;
                     fixPreview.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981;"></i> Fixed version ready:\n\n${preview}`;
                     applyFixBtn.disabled = false;
-                    
-                    // If auto-fix is enabled, show success message
-                    if (autoToggleActive) {
-                        fixPreview.innerHTML += `\n\n✨ Auto-fix mode: Click "Apply Fix" to update editor`;
-                    }
                 } else {
                     fixPreview.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981;"></i> No fixes needed! Code is already optimized.`;
                     applyFixBtn.disabled = true;
@@ -626,9 +584,9 @@ console.log("Average score:", avg);
                 console.error('Error:', error);
                 errorList.innerHTML = `
                     <div class="error-item" style="border-left-color: #f59e0b;">
-                        <div class="error-type">⚠️ API Error</div>
+                        <div class="error-type">⚠️ Error</div>
                         <div class="error-desc">${error.message}</div>
-                        <div class="error-line">Make sure GEMINI_API_KEY is set in Vercel environment</div>
+                        <div class="error-line">Check that GEMINI_API_KEY is set in Vercel environment variables</div>
                     </div>
                 `;
                 fixPreview.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> Error: ${error.message}`;
@@ -638,25 +596,16 @@ console.log("Average score:", avg);
             }
         }
 
-        // Apply fixed code
         function applyFixedCode() {
             if (!fixedCode) {
                 alert('No fix available. Click "Auto-Fix Now" first.');
                 return;
             }
-            
             codeEditor.value = fixedCode;
             applyFixBtn.disabled = true;
             fixPreview.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981;"></i> ✅ Code fixed and applied successfully!`;
-            
-            setTimeout(() => {
-                if (fixPreview.innerHTML.includes('applied successfully')) {
-                    fixPreview.innerHTML = `<i class="fas fa-check-circle" style="color: #10b981;"></i> Fix applied! You can edit further.`;
-                }
-            }, 2000);
         }
 
-        // Show diff
         function showDiff() {
             if (!fixedCode) {
                 alert('No fix available. Run auto-fix first.');
@@ -667,24 +616,12 @@ console.log("Average score:", avg);
                 alert('Code is already fixed! No differences.');
                 return;
             }
-            // Simple diff preview
             fixPreview.innerHTML = `<i class="fas fa-code-branch"></i> DIFFERENCE:\n\nORIGINAL (${current.length} chars)\nvs\nFIXED (${fixedCode.length} chars)\n\n--- FIXED VERSION ---\n${fixedCode.substring(0, 600)}...`;
         }
 
-        // Event listeners
         autoFixBtn.addEventListener('click', autoFixCode);
         applyFixBtn.addEventListener('click', applyFixedCode);
         previewDiffBtn.addEventListener('click', showDiff);
-
-        // Trigger initial analysis if auto mode is on
-        setTimeout(() => {
-            if (autoToggleActive && getCode().trim()) {
-                autoFixCode();
-            }
-        }, 500);
-
-        // Update character count in console
-        console.log('✨ Gemini Code Studio Ready | Professional Auto-Fix Enabled');
     </script>
 </body>
 </html>
