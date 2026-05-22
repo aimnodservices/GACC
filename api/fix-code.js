@@ -1,12 +1,11 @@
 export default async function handler(req, res) {
-    // CORS headers
+    // CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
     if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
+        return res.status(200).end();
     }
     
     if (req.method !== 'POST') {
@@ -14,41 +13,26 @@ export default async function handler(req, res) {
     }
     
     const { code } = req.body;
-    if (!code || code.trim() === '') {
+    if (!code) {
         return res.status(400).json({ error: 'No code provided' });
     }
     
+    // Get API key from environment
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    
     if (!GEMINI_API_KEY) {
         return res.status(500).json({ 
-            error: 'GEMINI_API_KEY not set in Vercel environment variables',
-            fix: 'Go to Vercel Dashboard → Settings → Environment Variables → Add GEMINI_API_KEY'
+            error: 'GEMINI_API_KEY not set in Vercel' 
         });
     }
     
     try {
-        // ✅ GOOGLE'S LATEST API ENDPOINT (December 2024)
-        // Using gemini-1.5-flash-002 (latest stable)
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        // ✅ GOOGLE'S OFFICIAL WORKING ENDPOINT - December 2024
+        // Using correct v1beta API with gemini-pro
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`;
         
-        const prompt = `You are an expert code debugger. Fix all bugs in this code and return ONLY valid JSON.
-
-Code to fix:
-${code}
-
-Return EXACTLY this JSON format (no other text):
-{
-  "errors": [
-    {
-      "type": "Bug Type",
-      "description": "What's wrong",
-      "line": "line number"
-    }
-  ],
-  "fixedCode": "The complete corrected code"
-}
-
-If no errors, return empty errors array and original code.`;
+        const systemPrompt = `You are a code debugger. Fix all bugs in the code and return JSON only.`;
+        const userPrompt = `Return ONLY this JSON format: {"errors":[{"type":"error type","description":"what's wrong","line":"line number"}],"fixedCode":"complete fixed code"}\n\nCode:\n${code}`;
         
         const response = await fetch(url, {
             method: 'POST',
@@ -56,45 +40,55 @@ If no errors, return empty errors array and original code.`;
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: prompt }]
-                }]
+                contents: [
+                    {
+                        parts: [{ text: systemPrompt }]
+                    },
+                    {
+                        parts: [{ text: userPrompt }]
+                    }
+                ],
+                generationConfig: {
+                    temperature: 0.1,
+                    maxOutputTokens: 2048,
+                }
             })
         });
         
         const data = await response.json();
         
         if (!response.ok) {
-            console.error('API Error:', data);
+            console.error('API Error:', JSON.stringify(data));
             throw new Error(data.error?.message || 'API request failed');
         }
         
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        
         if (!text) {
-            throw new Error('Empty response from Gemini');
+            throw new Error('Empty response');
         }
         
-        // Extract JSON from response
+        // Extract JSON
         let jsonStr = text;
-        const jsonStart = text.indexOf('{');
-        const jsonEnd = text.lastIndexOf('}') + 1;
-        if (jsonStart !== -1 && jsonEnd > jsonStart) {
-            jsonStr = text.substring(jsonStart, jsonEnd);
+        const start = text.indexOf('{');
+        const end = text.lastIndexOf('}') + 1;
+        if (start !== -1 && end > start) {
+            jsonStr = text.substring(start, end);
         }
         
         const result = JSON.parse(jsonStr);
         
-        // Ensure proper structure
+        // Ensure structure
         if (!result.errors) result.errors = [];
         if (!result.fixedCode) result.fixedCode = code;
         
         return res.status(200).json(result);
         
     } catch (error) {
-        console.error('Server Error:', error);
+        console.error('Error:', error);
         return res.status(500).json({ 
             error: error.message,
-            help: '1. Get new API key from https://aistudio.google.com/apikey\n2. Add it to Vercel environment variables\n3. Redeploy'
+            fix: 'Get new API key from https://aistudio.google.com/apikey'
         });
     }
 }
