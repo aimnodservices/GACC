@@ -2,203 +2,637 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Gemini Code Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Code Studio | Royal AI Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            font-family: system-ui, sans-serif;
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
             min-height: 100vh;
-            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
-        .container { max-width: 1400px; margin: 0 auto; }
-        .header {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
+
+        /* Royal Background Pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(88, 28, 135, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(79, 70, 229, 0.12) 0%, transparent 50%),
+                repeating-linear-gradient(45deg, rgba(255,215,0,0.02) 0px, rgba(255,215,0,0.02) 2px, transparent 2px, transparent 8px);
+            pointer-events: none;
+            z-index: 0;
         }
-        h1 { color: #333; }
-        .main {
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 20px;
+
+        /* Subtle Gold Border Animation */
+        @keyframes borderGlow {
+            0%, 100% { border-color: rgba(255, 215, 0, 0.2); box-shadow: 0 0 20px rgba(255, 215, 0, 0.05); }
+            50% { border-color: rgba(255, 215, 0, 0.5); box-shadow: 0 0 30px rgba(255, 215, 0, 0.1); }
         }
-        .editor-box {
-            background: #1e1e1e;
-            border-radius: 16px;
-            overflow: hidden;
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px;
+            position: relative;
+            z-index: 1;
         }
-        .toolbar {
-            background: #2d2d2d;
-            padding: 12px;
+
+        /* Royal Header */
+        .royal-header {
+            background: linear-gradient(135deg, rgba(15, 15, 25, 0.9), rgba(25, 20, 35, 0.95));
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 24px 36px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            animation: borderGlow 4s ease-in-out infinite;
+        }
+
+        .logo-area {
             display: flex;
-            gap: 10px;
+            align-items: center;
+            gap: 16px;
         }
-        textarea {
-            width: 100%;
-            height: 550px;
-            background: #1e1e1e;
-            color: #d4d4d4;
-            font-family: monospace;
+
+        .crown-icon {
+            font-size: 40px;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+        }
+
+        .logo-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #E8E8FF 0%, #FFD700 50%, #E8E8FF 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: rgba(255, 215, 0, 0.7);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .status-badge {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(139, 92, 246, 0.15));
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 10px 24px;
+            border-radius: 60px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #FFD700;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge i {
+            margin-right: 8px;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 440px;
+            gap: 28px;
+        }
+
+        /* Royal Editor Panel */
+        .royal-editor {
+            background: linear-gradient(135deg, rgba(12, 12, 20, 0.95), rgba(18, 16, 28, 0.98));
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            overflow: hidden;
+            box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .royal-editor:hover {
+            border-color: rgba(255, 215, 0, 0.4);
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6);
+        }
+
+        .editor-header {
+            background: linear-gradient(95deg, rgba(25, 22, 40, 0.9), rgba(35, 30, 50, 0.9));
+            padding: 18px 24px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .lang-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 215, 0, 0.08);
+            padding: 8px 18px;
+            border-radius: 40px;
+        }
+
+        .lang-indicator i {
+            color: #FFD700;
             font-size: 14px;
-            padding: 20px;
+        }
+
+        .lang-indicator span {
+            font-size: 13px;
+            font-weight: 500;
+            color: #E0E0E0;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-royal {
+            padding: 10px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #1a1a2e;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-emerald {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-emerald:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-outline-gold {
+            background: transparent;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            color: #FFD700;
+        }
+
+        .btn-outline-gold:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: #FFD700;
+        }
+
+        .btn-royal:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #codeEditor {
+            width: 100%;
+            height: 540px;
+            background: #0a0a0f;
+            color: #E8E8E8;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            padding: 28px;
             border: none;
             outline: none;
             resize: none;
+            line-height: 1.7;
+            tab-size: 4;
         }
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
+
+        /* Royal Cards */
+        .royal-card {
+            background: linear-gradient(135deg, rgba(15, 15, 25, 0.92), rgba(20, 18, 32, 0.95));
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .royal-card:hover {
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
         }
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-right: 8px;
+
+        .card-title i {
+            font-size: 24px;
+            color: #FFD700;
         }
-        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
-        .btn-success { background: #10b981; color: white; }
-        .error-item {
-            background: #fee;
-            border-left: 3px solid #ef4444;
-            padding: 10px;
-            margin-bottom: 8px;
-            border-radius: 6px;
-            font-size: 13px;
+
+        .card-title h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: #F0F0F0;
+            letter-spacing: 0.5px;
         }
-        .preview {
-            background: #f0f0f0;
-            padding: 12px;
-            border-radius: 8px;
-            font-family: monospace;
+
+        .card-title .count {
+            background: rgba(255, 215, 0, 0.15);
+            padding: 2px 10px;
+            border-radius: 30px;
             font-size: 12px;
-            max-height: 200px;
-            overflow: auto;
+            font-weight: 600;
+            color: #FFD700;
+            margin-left: auto;
+        }
+
+        /* Error Items */
+        .error-container {
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        .error-item {
+            background: rgba(239, 68, 68, 0.06);
+            border-left: 3px solid #ef4444;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .error-item:hover {
+            background: rgba(239, 68, 68, 0.1);
+            transform: translateX(4px);
+        }
+
+        .error-type {
+            font-weight: 700;
+            font-size: 12px;
+            color: #ef4444;
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .error-desc {
+            font-size: 12px;
+            color: #C0C0D0;
+            line-height: 1.5;
+        }
+
+        .error-line {
+            font-size: 10px;
+            color: #8888aa;
+            margin-top: 8px;
+        }
+
+        /* Preview Area */
+        .preview-area {
+            background: #0a0a0f;
+            border-radius: 14px;
+            padding: 16px;
+            max-height: 220px;
+            overflow-y: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 11px;
+            color: #A5F3C3;
             white-space: pre-wrap;
+            margin: 16px 0;
+            border: 1px solid rgba(255, 215, 0, 0.1);
         }
-        .loading {
+
+        /* Loading Overlay */
+        .royal-loading {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: black;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
             display: none;
+            justify-content: center;
+            align-items: center;
             z-index: 1000;
+            flex-direction: column;
+            gap: 20px;
         }
-        @media (max-width: 768px) { .main { grid-template-columns: 1fr; } }
+
+        .royal-loading.active {
+            display: flex;
+        }
+
+        .loading-crown {
+            font-size: 60px;
+            animation: crownFloat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes crownFloat {
+            0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 10px rgba(255,215,0,0.5)); }
+            50% { transform: translateY(-15px); filter: drop-shadow(0 0 25px rgba(255,215,0,0.8)); }
+        }
+
+        .loading-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            color: #FFD700;
+            letter-spacing: 2px;
+        }
+
+        .loading-spinner-royal {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-top-color: #FFD700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 10px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 16px;
+            }
+            .royal-header {
+                padding: 18px 24px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🤖 Gemini Code Editor</h1>
-            <p>AI-Powered Bug Fixer | Using Gemini API</p>
-        </div>
-        
-        <div class="main">
-            <div class="editor-box">
-                <div class="toolbar">
-                    <button class="btn-primary" id="fixBtn">🔍 Detect & Fix</button>
-                    <button class="btn-success" id="applyBtn" disabled>✅ Apply Fix</button>
+        <!-- Royal Header -->
+        <div class="royal-header">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+                <div class="logo-area">
+                    <div class="crown-icon">👑</div>
+                    <div class="logo-text">
+                        <h1>Gemini Code Studio</h1>
+                        <p>Royal AI Intelligence • Code Perfection</p>
+                    </div>
                 </div>
-                <textarea id="editor">// Buggy code example:
+                <div class="status-badge">
+                    <i class="fas fa-shield-alt"></i> Royal Secure • Gemini AI
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-grid">
+            <!-- Editor Panel -->
+            <div class="royal-editor">
+                <div class="editor-header">
+                    <div class="lang-indicator">
+                        <i class="fas fa-terminal"></i>
+                        <span>JavaScript / Python / TypeScript</span>
+                    </div>
+                    <div>
+                        <button class="btn-royal btn-gold" id="fixBtn">
+                            <i class="fas fa-wand-magic"></i> Royal Fix
+                        </button>
+                        <button class="btn-royal btn-emerald" id="applyBtn" disabled>
+                            <i class="fas fa-crown"></i> Apply Royal Fix
+                        </button>
+                    </div>
+                </div>
+                <textarea id="codeEditor" placeholder="Write your royal code here...">// Welcome to Royal Gemini Code Studio 👑
+// AI will detect and fix all bugs
+
 function calculateAverage(numbers) {
   let sum = 0;
+  // 👑 BUG: Off by one error
   for(let i = 0; i <= numbers.length; i++) {
     sum += numbers[i];
   }
   return sum / numbers.length;
 }
 
-const scores = [10, 20, 30, 40];
-console.log(calculateAverage(scores));</textarea>
+const scores = [85, 92, 78, 90];
+const avg = calculateAverage(scores);
+console.log("Royal Average:", avg);
+
+// Click "Royal Fix" - Let the AI work its magic!</textarea>
             </div>
-            
+
+            <!-- Right Panel -->
             <div>
-                <div class="card">
-                    <h3>🐛 Errors Found</h3>
-                    <div id="errors">Click "Detect & Fix" to start</div>
+                <!-- Errors Card -->
+                <div class="royal-card">
+                    <div class="card-title">
+                        <i class="fas fa-bug"></i>
+                        <h3>Royal Detections</h3>
+                        <span class="count" id="errorCount">0</span>
+                    </div>
+                    <div id="errorList" class="error-container">
+                        <div style="text-align: center; color: #8888aa; padding: 30px;">
+                            <i class="fas fa-crown" style="font-size: 35px; margin-bottom: 12px; opacity: 0.5;"></i>
+                            <p>Awaiting Royal Command</p>
+                            <p style="font-size: 11px; margin-top: 6px;">Click "Royal Fix" to begin</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="card">
-                    <h3>💡 AI Fix Preview</h3>
-                    <div id="preview" class="preview">No fix yet</div>
+
+                <!-- Fix Preview Card -->
+                <div class="royal-card">
+                    <div class="card-title">
+                        <i class="fas fa-eye"></i>
+                        <h3>Royal Fix Preview</h3>
+                    </div>
+                    <div id="fixPreview" class="preview-area">
+                        <i class="fas fa-crown" style="color: #FFD700;"></i> Your AI fix will appear here...
+                    </div>
+                    <button class="btn-royal btn-outline-gold" id="previewDiffBtn" style="width: 100%;">
+                        <i class="fas fa-code-branch"></i> View Royal Difference
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    
-    <div id="loading" class="loading">🤖 AI is thinking...</div>
+
+    <!-- Royal Loading Overlay -->
+    <div id="loadingOverlay" class="royal-loading">
+        <div class="loading-crown">👑</div>
+        <div class="loading-spinner-royal"></div>
+        <div class="loading-text">Gemini AI is meditating...</div>
+        <div style="font-size: 12px; color: #aaa;">Summoning the fix for your code</div>
+    </div>
 
     <script>
-        const editor = document.getElementById('editor');
+        // DOM Elements
+        const codeEditor = document.getElementById('codeEditor');
         const fixBtn = document.getElementById('fixBtn');
         const applyBtn = document.getElementById('applyBtn');
-        const errorsDiv = document.getElementById('errors');
-        const previewDiv = document.getElementById('preview');
-        const loading = document.getElementById('loading');
-        
+        const errorList = document.getElementById('errorList');
+        const fixPreview = document.getElementById('fixPreview');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const errorCount = document.getElementById('errorCount');
+        const previewDiffBtn = document.getElementById('previewDiffBtn');
+
         let fixedCode = '';
-        
-        async function detectAndFix() {
-            const code = editor.value;
-            if (!code.trim()) return alert('Write some code first!');
-            
-            loading.style.display = 'block';
+
+        function getCode() {
+            return codeEditor.value;
+        }
+
+        function updateErrorDisplay(errors) {
+            if (!errors || errors.length === 0) {
+                errorList.innerHTML = `
+                    <div style="text-align: center; color: #10b981; padding: 30px;">
+                        <i class="fas fa-check-circle" style="font-size: 35px; margin-bottom: 12px;"></i>
+                        <p>✨ Perfect! No issues found</p>
+                        <p style="font-size: 11px; margin-top: 6px;">Your code is royalty ready</p>
+                    </div>
+                `;
+                errorCount.textContent = '0';
+                return;
+            }
+
+            let html = '';
+            errors.forEach(err => {
+                html += `
+                    <div class="error-item">
+                        <div class="error-type">
+                            <i class="fas fa-exclamation-triangle"></i> ${err.type || 'Royal Issue'}
+                        </div>
+                        <div class="error-desc">${err.description || err.message}</div>
+                        <div class="error-line"><i class="fas fa-map-pin"></i> Line: ${err.line || 'Unknown'}</div>
+                    </div>
+                `;
+            });
+            errorList.innerHTML = html;
+            errorCount.textContent = errors.length;
+        }
+
+        async function autoFixCode() {
+            const code = getCode();
+            if (!code.trim()) {
+                alert('Please write some code first!');
+                return;
+            }
+
+            loadingOverlay.classList.add('active');
             fixBtn.disabled = true;
-            
+
             try {
-                const res = await fetch('/api/fix-code', {
+                const response = await fetch('/api/fix-code', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code })
+                    body: JSON.stringify({ code: code })
                 });
-                
-                const data = await res.json();
-                
-                if (data.errors?.length) {
-                    errorsDiv.innerHTML = data.errors.map(e => 
-                        `<div class="error-item"><strong>⚠️ ${e.type}</strong><br>${e.description}<br><small>Line: ${e.line || '?'}</small></div>`
-                    ).join('');
-                } else {
-                    errorsDiv.innerHTML = '<div style="color: #10b981;">✅ No errors found!</div>';
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'API call failed');
                 }
+
+                const result = await response.json();
                 
-                fixedCode = data.fixedCode || code;
+                updateErrorDisplay(result.errors || []);
+                fixedCode = result.fixedCode || code;
                 
                 if (fixedCode !== code) {
-                    previewDiv.innerHTML = fixedCode.substring(0, 500);
+                    const preview = fixedCode.length > 600 ? fixedCode.substring(0, 600) + '...' : fixedCode;
+                    fixPreview.innerHTML = `<i class="fas fa-crown" style="color: #FFD700;"></i> Royal Fix Ready:\n\n${preview}`;
                     applyBtn.disabled = false;
                 } else {
-                    previewDiv.innerHTML = '✨ No fixes needed!';
+                    fixPreview.innerHTML = `<i class="fas fa-crown" style="color: #10b981;"></i> Your code is already magnificent! No fixes needed.`;
+                    applyBtn.disabled = true;
                 }
-            } catch(err) {
-                errorsDiv.innerHTML = `<div class="error-item">❌ Error: ${err.message}</div>`;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                errorList.innerHTML = `
+                    <div class="error-item" style="border-left-color: #f59e0b;">
+                        <div class="error-type">⚠️ Royal Alert</div>
+                        <div class="error-desc">${error.message}</div>
+                        <div class="error-line">Ensure GEMINI_API_KEY is set in Vercel</div>
+                    </div>
+                `;
+                fixPreview.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i> Error: ${error.message}`;
             } finally {
-                loading.style.display = 'none';
+                loadingOverlay.classList.remove('active');
                 fixBtn.disabled = false;
             }
         }
-        
-        function applyFix() {
-            if (fixedCode) {
-                editor.value = fixedCode;
-                applyBtn.disabled = true;
-                previewDiv.innerHTML = '✅ Code fixed and applied!';
+
+        function applyFixedCode() {
+            if (!fixedCode) {
+                alert('No royal fix available. Click "Royal Fix" first.');
+                return;
             }
+            codeEditor.value = fixedCode;
+            applyBtn.disabled = true;
+            fixPreview.innerHTML = `<i class="fas fa-crown" style="color: #10b981;"></i> ✅ Royal fix applied! Your code is now perfect.`;
         }
-        
-        fixBtn.addEventListener('click', detectAndFix);
-        applyBtn.addEventListener('click', applyFix);
+
+        function showDiff() {
+            if (!fixedCode) {
+                alert('No fix available. Run royal fix first.');
+                return;
+            }
+            const current = getCode();
+            if (current === fixedCode) {
+                alert('Your code is already in royal condition! No differences.');
+                return;
+            }
+            fixPreview.innerHTML = `<i class="fas fa-code-branch"></i> Royal Difference:\n\nORIGINAL (${current.length} chars)\nvs\nFIXED (${fixedCode.length} chars)\n\n--- Fixed Royal Code ---\n${fixedCode.substring(0, 600)}...`;
+        }
+
+        fixBtn.addEventListener('click', autoFixCode);
+        applyBtn.addEventListener('click', applyFixedCode);
+        previewDiffBtn.addEventListener('click', showDiff);
     </script>
 </body>
 </html>
